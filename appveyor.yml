@@ -1,0 +1,26 @@
+version: 1.0.{build}
+branches:
+  only:
+  - master
+os: Visual Studio 2015
+configuration: Release
+cache:
+  - packages -> **\packages.config
+install:
+- ps: (new-object Net.WebClient).DownloadString("https://raw.github.com/madskristensen/ExtensionScripts/master/AppVeyor/vsix.ps1") | iex
+before_build:
+- ps: Vsix-IncrementVsixVersion | Vsix-UpdateBuildVersion
+build_script:
+- nuget restore
+- msbuild /p:configuration=Release /p:DeployExtension=false /verbosity:minimal
+after_test:
+- ps: Vsix-PushArtifacts src\WpfDiagnostics.Vsix\bin\Release\WpfDiagnostics.vsix | Vsix-PublishToGallery src\WpfDiagnostics.Vsix\bin\Release\WpfDiagnostics.vsix
+artifacts:
+- path: '**\bin\**\*.vsix'
+  name: WpfDiagnostics.vsix
+- path: '**\WpfDiagnostics.1.0.*.*.nupkg'
+  name: WpfDiagnostics.nupkg
+deploy:
+- provider: NuGet
+  api_key:
+    secure: FgO+hO78M4KmYjCzv88xo/PsLLehbnzYGsEYFkhk2tmMKJMl632frvthC9nj8tAl
