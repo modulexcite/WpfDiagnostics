@@ -1,21 +1,21 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
 
 using RoslynTester.DiagnosticResults;
 using RoslynTester.Helpers.CSharp;
 
+using Xunit;
+
 namespace WpfDiagnostics.Test
 {
-    [TestClass]
     public class UnitTest : CSharpCodeFixVerifier
     {
 
         //No diagnostics expected to show up
-        [TestMethod]
+        [Fact]
         public void TestMethod1()
         {
             var test = @"";
@@ -24,7 +24,7 @@ namespace WpfDiagnostics.Test
         }
 
         //Diagnostic and CodeFix both triggered and checked for
-        [TestMethod]
+        [Fact]
         public void TestMethod2()
         {
             var test = @"
