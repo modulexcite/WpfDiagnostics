@@ -2,14 +2,16 @@
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using System;
-using TestHelper;
-using WpfDiagnostics;
+
+using RoslynTester.DiagnosticResults;
+using RoslynTester.Helpers.CSharp;
 
 namespace WpfDiagnostics.Test
 {
     [TestClass]
-    public class UnitTest : CodeFixVerifier
+    public class UnitTest : CSharpCodeFixVerifier
     {
 
         //No diagnostics expected to show up
@@ -18,7 +20,7 @@ namespace WpfDiagnostics.Test
         {
             var test = @"";
 
-            VerifyCSharpDiagnostic(test);
+            VerifyDiagnostic(test);
         }
 
         //Diagnostic and CodeFix both triggered and checked for
@@ -50,7 +52,7 @@ namespace WpfDiagnostics.Test
                         }
             };
 
-            VerifyCSharpDiagnostic(test, expected);
+            VerifyDiagnostic(test, expected);
 
             var fixtest = @"
     using System;
@@ -66,17 +68,10 @@ namespace WpfDiagnostics.Test
         {   
         }
     }";
-            VerifyCSharpFix(test, fixtest);
+            VerifyFix(test, fixtest);
         }
 
-        protected override CodeFixProvider GetCSharpCodeFixProvider()
-        {
-            return new WpfDiagnosticsCodeFixProvider();
-        }
-
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new WpfDiagnosticsAnalyzer();
-        }
+        protected override DiagnosticAnalyzer DiagnosticAnalyzer { get; } = new WpfDiagnosticsAnalyzer();
+        protected override CodeFixProvider CodeFixProvider { get; } = new WpfDiagnosticsCodeFixProvider();
     }
 }
