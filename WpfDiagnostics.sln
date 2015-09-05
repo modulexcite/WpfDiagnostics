@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfDiagnostics", "WpfDiagnostics\WpfDiagnostics\WpfDiagnostics.csproj", "{D998D3A1-1CFD-469E-8A76-6683D225C465}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfDiagnostics", "src\WpfDiagnostics\WpfDiagnostics.csproj", "{D998D3A1-1CFD-469E-8A76-6683D225C465}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfDiagnostics.Test", "WpfDiagnostics\WpfDiagnostics.Test\WpfDiagnostics.Test.csproj", "{7C63FA2B-88EE-476D-BF22-D4793A8F4C63}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfDiagnostics.Test", "src\WpfDiagnostics.Test\WpfDiagnostics.Test.csproj", "{7C63FA2B-88EE-476D-BF22-D4793A8F4C63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfDiagnostics.Vsix", "WpfDiagnostics\WpfDiagnostics.Vsix\WpfDiagnostics.Vsix.csproj", "{F42AC55D-6F5B-4EFB-91A3-343209B767DA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfDiagnostics.Vsix", "src\WpfDiagnostics.Vsix\WpfDiagnostics.Vsix.csproj", "{F42AC55D-6F5B-4EFB-91A3-343209B767DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
