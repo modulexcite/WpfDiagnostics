@@ -2,8 +2,7 @@
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 
-using RoslynTester.DiagnosticResults;
-using RoslynTester.Helpers.CSharp;
+using TestHelper;
 
 using WpfDiagnostics.Diagnostics.CustomControls;
 
@@ -11,13 +10,13 @@ using Xunit;
 
 namespace WpfDiagnostics.Test.Diagnostics.CustomControls
 {
-    public class DependencyPropertyWithoutNameOfOperatorTests : CSharpDiagnosticVerifier
+    public class DependencyPropertyWithoutNameOfOperatorTests : DiagnosticVerifier
     {
         [Fact]
         public void WithEmptySourceFile_ShouldNotFindAnything()
         {
             var test = @"";
-            VerifyDiagnostic(test);
+            VerifyCSharpDiagnostic(test);
         }
 
         // scenario's:
@@ -59,9 +58,12 @@ namespace WpfDiagnostics.Test.Diagnostics.CustomControls
                             new DiagnosticResultLocation("Test0.cs", expectedLocation.Line, expectedLocation.Character)
                         }
             };
-            VerifyDiagnostic(brokenSource, expected);
+            VerifyCSharpDiagnostic(brokenSource, expected);
         }
 
-        protected override DiagnosticAnalyzer DiagnosticAnalyzer { get; } = new DependencyPropertyWithoutNameOfOperatorAnalyzer();
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+        {
+            return new DependencyPropertyWithoutNameOfOperatorAnalyzer();
+        }
     }
 }
