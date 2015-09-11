@@ -33,10 +33,11 @@ namespace TestHelper
         /// <param name="sources">Classes in the form of strings</param>
         /// <param name="language">The language the source classes are in</param>
         /// <param name="analyzer">The analyzer to be run on the sources</param>
+        /// <param name="additionalProjectReferences">Additional references that need to be added to the generated project.</param>
         /// <returns>An IEnumerable of Diagnostics that surfaced in the source code, sorted by Location</returns>
-        private static Diagnostic[] GetSortedDiagnostics(string[] sources, string language, DiagnosticAnalyzer analyzer)
+        private static Diagnostic[] GetSortedDiagnostics(string[] sources, string language, DiagnosticAnalyzer analyzer, IEnumerable<MetadataReference> additionalProjectReferences = default(IEnumerable<MetadataReference>))
         {
-            return GetSortedDiagnosticsFromDocuments(analyzer, GetDocuments(sources, language));
+            return GetSortedDiagnosticsFromDocuments(analyzer, GetDocuments(sources, language, additionalProjectReferences));
         }
 
         /// <summary>
@@ -98,20 +99,23 @@ namespace TestHelper
         #endregion
 
         #region Set up compilation and documents
+
         /// <summary>
         /// Given an array of strings as sources and a language, turn them into a project and return the documents and spans of it.
         /// </summary>
         /// <param name="sources">Classes in the form of strings</param>
         /// <param name="language">The language the source code is in</param>
+        /// <param name="additionalProjectReferences">Additional references that need to be added to the generated project.</param>
         /// <returns>A Tuple containing the Documents produced from the sources and their TextSpans if relevant</returns>
-        private static Document[] GetDocuments(string[] sources, string language)
+        private static Document[] GetDocuments(string[] sources, string language, IEnumerable<MetadataReference> additionalProjectReferences = default(IEnumerable<MetadataReference>))
         {
             if (language != LanguageNames.CSharp && language != LanguageNames.VisualBasic)
             {
                 throw new ArgumentException("Unsupported Language");
             }
 
-            var project = CreateProject(sources, language);
+
+            var project = CreateProject(sources, language, additionalProjectReferences);
             var documents = project.Documents.ToArray();
 
             if (sources.Length != documents.Length)
@@ -138,11 +142,14 @@ namespace TestHelper
         /// </summary>
         /// <param name="sources">Classes in the form of strings</param>
         /// <param name="language">The language the source code is in</param>
+        /// <param name="additionalProjectReferences">Additional references that will be added to the generated project.</param>
         /// <returns>A Project created out of the Documents created from the source strings</returns>
-        private static Project CreateProject(string[] sources, string language = LanguageNames.CSharp)
+        private static Project CreateProject(string[] sources, string language = LanguageNames.CSharp, IEnumerable<MetadataReference> additionalProjectReferences = default(IEnumerable<MetadataReference>))
         {
+            
             string fileNamePrefix = DefaultFilePathPrefix;
             string fileExt = language == LanguageNames.CSharp ? CSharpDefaultFileExt : VisualBasicDefaultExt;
+            additionalProjectReferences = additionalProjectReferences ?? Enumerable.Empty<MetadataReference>();
 
             var projectId = ProjectId.CreateNewId(debugName: TestProjectName);
 
@@ -152,7 +159,8 @@ namespace TestHelper
                 .AddMetadataReference(projectId, CorlibReference)
                 .AddMetadataReference(projectId, SystemCoreReference)
                 .AddMetadataReference(projectId, CSharpSymbolsReference)
-                .AddMetadataReference(projectId, CodeAnalysisReference);
+                .AddMetadataReference(projectId, CodeAnalysisReference)
+                .AddMetadataReferences(projectId, additionalProjectReferences);
 
             int count = 0;
             foreach (var source in sources)

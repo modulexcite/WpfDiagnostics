@@ -29,6 +29,8 @@ namespace TestHelper
         {
             return null;
         }
+
+        protected virtual IEnumerable<MetadataReference> AdditionalProjectReferences => Enumerable.Empty<MetadataReference>();
         #endregion
 
         #region Verifier wrappers
@@ -87,7 +89,7 @@ namespace TestHelper
         /// <param name="expected">DiagnosticResults that should appear after the analyzer is run on the sources</param>
         private void VerifyDiagnostics(string[] sources, string language, DiagnosticAnalyzer analyzer, params DiagnosticResult[] expected)
         {
-            var diagnostics = GetSortedDiagnostics(sources, language, analyzer);
+            var diagnostics = GetSortedDiagnostics(sources, language, analyzer, AdditionalProjectReferences);
             VerifyDiagnosticResults(diagnostics, analyzer, expected);
         }
 
