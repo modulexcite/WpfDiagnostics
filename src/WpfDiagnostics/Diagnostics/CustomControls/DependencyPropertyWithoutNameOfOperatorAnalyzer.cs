@@ -13,6 +13,9 @@ namespace WpfDiagnostics.Diagnostics.CustomControls
         private const string DiagnosticId = nameof(DependencyPropertyWithoutNameOfOperatorAnalyzer);
         private const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
 
+        private const string DependencyPropertyTypeName = "System.Windows.DependencyProperty";
+        private const string RegisterMethodName = "Register";
+
         private static readonly string Category = "Custom Controls";
         private static readonly string Message = "Dependency property '{0}' can use nameof() operator for DependencyProperty.Register() call";
         private static readonly string Title = "Use nameof";
@@ -26,13 +29,17 @@ namespace WpfDiagnostics.Diagnostics.CustomControls
             context.RegisterSyntaxNodeAction(AnalyzeInvocationExpression, SyntaxKind.InvocationExpression);
         }
 
-        private void AnalyzeInvocationExpression(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeInvocationExpression(SyntaxNodeAnalysisContext context)
         {
             var invocationNode = (InvocationExpressionSyntax)context.Node;
             var memberAccessNode = (MemberAccessExpressionSyntax)invocationNode.Expression;
-            var typeNameNode = (IdentifierNameSyntax) memberAccessNode.Expression;
             var methodNameNode = (IdentifierNameSyntax) memberAccessNode.Name;
-            if (typeNameNode.Identifier.Text == "DependencyProperty" && methodNameNode.Identifier.Text == "Register")
+
+            var memberAccessSymbol = context.SemanticModel.GetSymbolInfo(methodNameNode).Symbol;
+            if (memberAccessSymbol == null)
+                return;
+
+            if (GetRegisterMethodSymbols(context.SemanticModel.Compilation).Contains(memberAccessSymbol))
             {
                 var firstArgumentNode = invocationNode.ArgumentList.Arguments.First();
                 var firstArgumentExpressionNode = firstArgumentNode.Expression;
@@ -42,6 +49,12 @@ namespace WpfDiagnostics.Diagnostics.CustomControls
                     context.ReportDiagnostic(Diagnostic.Create(Rule, firstArgumentNode.GetLocation(), depPropName));
                 }
             }
+        }
+
+        private static ImmutableArray<ISymbol> GetRegisterMethodSymbols(Compilation compilation)
+        {
+            var dependencyPropertySymbol = compilation.GetTypeByMetadataName(DependencyPropertyTypeName);
+            return dependencyPropertySymbol.GetMembers(RegisterMethodName);
         }
 
         private static bool IsNameOf(ExpressionSyntax firstArgumentExpressionNode)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Windows;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -103,7 +104,8 @@ namespace WpfDiagnostics.Test.Diagnostics.CustomControls
             return new DependencyPropertyWithoutNameOfOperatorAnalyzer();
         }
 
-        private static readonly MetadataReference DependencyPropertyReference = MetadataReference.CreateFromAssembly(typeof(System.Windows.DependencyProperty).Assembly);
+        private static readonly MetadataReference DependencyPropertyReference =
+            MetadataReference.CreateFromFile(typeof(DependencyProperty).Assembly.Location);
 
         protected override IEnumerable<MetadataReference> AdditionalProjectReferences
         {
