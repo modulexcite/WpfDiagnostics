@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Generic;
+
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 
@@ -99,6 +101,13 @@ namespace WpfDiagnostics.Test.Diagnostics.CustomControls
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
             return new DependencyPropertyWithoutNameOfOperatorAnalyzer();
+        }
+
+        private static readonly MetadataReference DependencyPropertyReference = MetadataReference.CreateFromAssembly(typeof(System.Windows.DependencyProperty).Assembly);
+
+        protected override IEnumerable<MetadataReference> AdditionalProjectReferences
+        {
+            get { yield return DependencyPropertyReference; }
         }
     }
 }
