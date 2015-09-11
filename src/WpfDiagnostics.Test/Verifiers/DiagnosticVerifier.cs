@@ -38,10 +38,11 @@ namespace TestHelper
         /// Note: input a DiagnosticResult for each Diagnostic expected
         /// </summary>
         /// <param name="source">A class in the form of a string to run the analyzer on</param>
+        /// <param name="additionalProjectReferences">Additional references that need to be added to the generated project.</param>
         /// <param name="expected"> DiagnosticResults that should appear after the analyzer is run on the source</param>
-        protected void VerifyCSharpDiagnostic(string source, params DiagnosticResult[] expected)
+        protected void VerifyCSharpDiagnostic(string source, IEnumerable<MetadataReference> additionalProjectReferences = null, params DiagnosticResult[] expected)
         {
-            VerifyDiagnostics(new[] { source }, LanguageNames.CSharp, GetCSharpDiagnosticAnalyzer(), expected);
+            VerifyDiagnostics(new[] { source }, additionalProjectReferences, LanguageNames.CSharp, GetCSharpDiagnosticAnalyzer(), expected);
         }
 
         /// <summary>
@@ -49,10 +50,11 @@ namespace TestHelper
         /// Note: input a DiagnosticResult for each Diagnostic expected
         /// </summary>
         /// <param name="source">A class in the form of a string to run the analyzer on</param>
+        /// <param name="additionalProjectReferences">Additional references that need to be added to the generated project.</param>
         /// <param name="expected">DiagnosticResults that should appear after the analyzer is run on the source</param>
-        protected void VerifyBasicDiagnostic(string source, params DiagnosticResult[] expected)
+        protected void VerifyBasicDiagnostic(string source, IEnumerable<MetadataReference> additionalProjectReferences = null, params DiagnosticResult[] expected)
         {
-            VerifyDiagnostics(new[] { source }, LanguageNames.VisualBasic, GetBasicDiagnosticAnalyzer(), expected);
+            VerifyDiagnostics(new[] { source }, additionalProjectReferences, LanguageNames.VisualBasic, GetBasicDiagnosticAnalyzer(), expected);
         }
 
         /// <summary>
@@ -60,10 +62,11 @@ namespace TestHelper
         /// Note: input a DiagnosticResult for each Diagnostic expected
         /// </summary>
         /// <param name="sources">An array of strings to create source documents from to run the analyzers on</param>
+        /// <param name="additionalProjectReferences">Additional references that need to be added to the generated project.</param>
         /// <param name="expected">DiagnosticResults that should appear after the analyzer is run on the sources</param>
-        protected void VerifyCSharpDiagnostic(string[] sources, params DiagnosticResult[] expected)
+        protected void VerifyCSharpDiagnostic(string[] sources, IEnumerable<MetadataReference> additionalProjectReferences = null, params DiagnosticResult[] expected)
         {
-            VerifyDiagnostics(sources, LanguageNames.CSharp, GetCSharpDiagnosticAnalyzer(), expected);
+            VerifyDiagnostics(sources, additionalProjectReferences, LanguageNames.CSharp, GetCSharpDiagnosticAnalyzer(), expected);
         }
 
         /// <summary>
@@ -71,10 +74,11 @@ namespace TestHelper
         /// Note: input a DiagnosticResult for each Diagnostic expected
         /// </summary>
         /// <param name="sources">An array of strings to create source documents from to run the analyzers on</param>
+        /// <param name="additionalProjectReferences">Additional references that need to be added to the generated project.</param>
         /// <param name="expected">DiagnosticResults that should appear after the analyzer is run on the sources</param>
-        protected void VerifyBasicDiagnostic(string[] sources, params DiagnosticResult[] expected)
+        protected void VerifyBasicDiagnostic(string[] sources, IEnumerable<MetadataReference> additionalProjectReferences = null, params DiagnosticResult[] expected)
         {
-            VerifyDiagnostics(sources, LanguageNames.VisualBasic, GetBasicDiagnosticAnalyzer(), expected);
+            VerifyDiagnostics(sources, additionalProjectReferences, LanguageNames.VisualBasic, GetBasicDiagnosticAnalyzer(), expected);
         }
 
         /// <summary>
@@ -83,11 +87,14 @@ namespace TestHelper
         /// </summary>
         /// <param name="sources">An array of strings to create source documents from to run the analyzers on</param>
         /// <param name="language">The language of the classes represented by the source strings</param>
+        /// <param name="additionalProjectReferences">Additional references that need to be added to the generated project.</param>
         /// <param name="analyzer">The analyzer to be run on the source code</param>
         /// <param name="expected">DiagnosticResults that should appear after the analyzer is run on the sources</param>
-        private void VerifyDiagnostics(string[] sources, string language, DiagnosticAnalyzer analyzer, params DiagnosticResult[] expected)
+        private void VerifyDiagnostics(string[] sources, IEnumerable<MetadataReference> additionalProjectReferences, string language,
+            DiagnosticAnalyzer analyzer, params DiagnosticResult[] expected)
         {
-            var diagnostics = GetSortedDiagnostics(sources, language, analyzer);
+            additionalProjectReferences = additionalProjectReferences ?? Enumerable.Empty<MetadataReference>();
+            var diagnostics = GetSortedDiagnostics(sources, language, additionalProjectReferences, analyzer);
             VerifyDiagnosticResults(diagnostics, analyzer, expected);
         }
 

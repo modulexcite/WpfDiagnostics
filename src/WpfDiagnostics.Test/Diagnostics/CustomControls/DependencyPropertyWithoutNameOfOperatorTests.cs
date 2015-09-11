@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Linq;
+
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 
@@ -58,7 +60,7 @@ namespace WpfDiagnostics.Test.Diagnostics.CustomControls
                             new DiagnosticResultLocation("Test0.cs", expectedLocation.Line, expectedLocation.Character)
                         }
             };
-            VerifyCSharpDiagnostic(brokenSource, expected);
+            VerifyCSharpDiagnostic(brokenSource, Enumerable.Empty<MetadataReference>(), expected);
         }
 
         [Fact]
