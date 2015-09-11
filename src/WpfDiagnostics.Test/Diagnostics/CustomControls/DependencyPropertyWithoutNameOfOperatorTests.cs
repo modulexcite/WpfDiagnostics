@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Windows;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -60,7 +60,7 @@ namespace WpfDiagnostics.Test.Diagnostics.CustomControls
                             new DiagnosticResultLocation("Test0.cs", expectedLocation.Line, expectedLocation.Character)
                         }
             };
-            VerifyCSharpDiagnostic(brokenSource, Enumerable.Empty<MetadataReference>(), expected);
+            VerifyCSharpDiagnostic(brokenSource, WpfReferences, expected);
         }
 
         [Fact]
@@ -97,6 +97,10 @@ namespace WpfDiagnostics.Test.Diagnostics.CustomControls
     }";
             VerifyCSharpDiagnostic(nonBrokenSource);
         }
+        private static MetadataReference[] WpfReferences => new[] { DependencyPropertyReference };
+
+        private static readonly MetadataReference DependencyPropertyReference =
+            MetadataReference.CreateFromFile(typeof(DependencyProperty).Assembly.Location);
 
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
