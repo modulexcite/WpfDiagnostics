@@ -34,15 +34,52 @@ namespace WpfDiagnostics.Diagnostics.CustomControls
             var methodNameNode = (IdentifierNameSyntax) memberAccessNode.Name;
             if (typeNameNode.Identifier.Text == "DependencyProperty" && methodNameNode.Identifier.Text == "Register")
             {
-
                 var firstArgumentNode = invocationNode.ArgumentList.Arguments.First();
                 var firstArgumentExpressionNode = firstArgumentNode.Expression;
-                if (firstArgumentExpressionNode.Kind() != SyntaxKind.NameOfKeyword)
+                if (!IsNameOf(firstArgumentExpressionNode))
                 {
                     var depPropName = context.SemanticModel.GetConstantValue(firstArgumentExpressionNode).Value;
                     context.ReportDiagnostic(Diagnostic.Create(Rule, firstArgumentNode.GetLocation(), depPropName));
                 }
             }
+        }
+
+        private static bool IsNameOf(ExpressionSyntax firstArgumentExpressionNode)
+        {
+            return firstArgumentExpressionNode.Kind() == SyntaxKind.InvocationExpression
+                   && ((InvocationExpressionSyntax) firstArgumentExpressionNode).IsNameOfExpression();
+        }
+    }
+
+    internal static class NameOfExaminator
+    {
+        public static bool IsNameOfExpression(this InvocationExpressionSyntax invocationNode)
+        {
+            var identifierNode = invocationNode.Expression as IdentifierNameSyntax;
+            if (identifierNode == null)
+            {
+                return false;
+            }
+            return identifierNode.IsNameOfIdentifier();
+        }
+
+        public static bool IsNameOfIdentifier(this IdentifierNameSyntax identifierNode)
+        {
+            return identifierNode.Identifier.IsKindOrHasMatchingText(SyntaxKind.NameOfKeyword);
+        }
+    }
+
+    internal static class SyntaxTokenExtensions
+    {
+        public static bool IsKindOrHasMatchingText(this SyntaxToken token, SyntaxKind kind)
+        {
+            return token.Kind() == kind || token.HasMatchingText(kind);
+        }
+
+        public static bool HasMatchingText(this SyntaxToken token, SyntaxKind kind)
+        {
+            var text = SyntaxFacts.GetText(kind);
+            return token.ToString() == text;
         }
     }
 }

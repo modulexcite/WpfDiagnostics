@@ -27,7 +27,7 @@ namespace WpfDiagnostics.Test.Diagnostics.CustomControls
         // * compilation unit is not referencing "Wpf"-assembly
 
         [Fact]
-        public void RegisterCall_WithoutFirstArgumentNameOfExpression_ShouldChangeIntoNameOf()
+        public void RegisterCall_WithoutFirstArgumentNameOfExpression_ShouldReport()
         {
             var brokenSource = @"
     using System.Windows;
@@ -59,6 +59,41 @@ namespace WpfDiagnostics.Test.Diagnostics.CustomControls
                         }
             };
             VerifyCSharpDiagnostic(brokenSource, expected);
+        }
+
+        [Fact]
+        public void RegisterCall_WithFirstArgumentNameOfExpression_ShouldNotReport()
+        {
+            var nonBrokenSource = @"
+    using System.Windows;
+
+    public class ClassWithDependencyProperty : DependencyObject
+    {
+        public static readonly DependencyProperty DependencyPropertyNameProperty =
+            DependencyProperty.Register(
+                nameof(DependencyPropertyName),
+                typeof(string),
+                typeof(ClassWithDependencyProperty),
+                new PropertyMetadata(default(string)));
+
+        public string DependencyPropertyName
+        {
+            get { return (string)GetValue(DependencyPropertyNameProperty); }
+            set { SetValue(DependencyPropertyNameProperty, value); }
+        }
+    }";
+            VerifyCSharpDiagnostic(nonBrokenSource);
+        }
+
+        [Fact]
+        public void Class_WithoutRegisterCall_ShouldNotReport()
+        {
+            var nonBrokenSource = @"
+    public class AClass
+    {
+        public string DependencyPropertyName { get; set; }
+    }";
+            VerifyCSharpDiagnostic(nonBrokenSource);
         }
 
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
