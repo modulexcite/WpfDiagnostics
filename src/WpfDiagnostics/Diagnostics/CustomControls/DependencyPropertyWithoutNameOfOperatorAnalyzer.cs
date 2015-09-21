@@ -41,7 +41,6 @@ namespace WpfDiagnostics.Diagnostics.CustomControls
                 {
                     var depPropName = context.SemanticModel.GetConstantValue(firstArgumentExpressionNode).Value;
                     context.ReportDiagnostic(Diagnostic.Create(Rule, firstArgumentNode.GetLocation(), depPropName));
-                    
                 }
             }
         }
