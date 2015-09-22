@@ -61,7 +61,7 @@ namespace WpfDiagnostics.Test.Diagnostics.CustomControls
                             new DiagnosticResultLocation("Test0.cs", expectedLocation.Line, expectedLocation.Character)
                         }
             };
-            VerifyCSharpDiagnostic(brokenSource, expected);
+            VerifyCSharpDiagnostic(brokenSource, WpfReferences, expected);
         }
 
         [Fact]
@@ -98,18 +98,14 @@ namespace WpfDiagnostics.Test.Diagnostics.CustomControls
     }";
             VerifyCSharpDiagnostic(nonBrokenSource);
         }
-
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new DependencyPropertyWithoutNameOfOperatorAnalyzer();
-        }
+        private static MetadataReference[] WpfReferences => new[] { DependencyPropertyReference };
 
         private static readonly MetadataReference DependencyPropertyReference =
             MetadataReference.CreateFromFile(typeof(DependencyProperty).Assembly.Location);
 
-        protected override IEnumerable<MetadataReference> AdditionalProjectReferences
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
-            get { yield return DependencyPropertyReference; }
+            return new DependencyPropertyWithoutNameOfOperatorAnalyzer();
         }
     }
 }

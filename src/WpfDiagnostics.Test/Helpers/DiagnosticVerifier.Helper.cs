@@ -32,10 +32,10 @@ namespace TestHelper
         /// </summary>
         /// <param name="sources">Classes in the form of strings</param>
         /// <param name="language">The language the source classes are in</param>
-        /// <param name="analyzer">The analyzer to be run on the sources</param>
         /// <param name="additionalProjectReferences">Additional references that need to be added to the generated project.</param>
+        /// <param name="analyzer">The analyzer to be run on the sources</param>
         /// <returns>An IEnumerable of Diagnostics that surfaced in the source code, sorted by Location</returns>
-        private static Diagnostic[] GetSortedDiagnostics(string[] sources, string language, DiagnosticAnalyzer analyzer, IEnumerable<MetadataReference> additionalProjectReferences = default(IEnumerable<MetadataReference>))
+        private static Diagnostic[] GetSortedDiagnostics(string[] sources, string language, IEnumerable<MetadataReference> additionalProjectReferences, DiagnosticAnalyzer analyzer)
         {
             return GetSortedDiagnosticsFromDocuments(analyzer, GetDocuments(sources, language, additionalProjectReferences));
         }
@@ -107,7 +107,7 @@ namespace TestHelper
         /// <param name="language">The language the source code is in</param>
         /// <param name="additionalProjectReferences">Additional references that need to be added to the generated project.</param>
         /// <returns>A Tuple containing the Documents produced from the sources and their TextSpans if relevant</returns>
-        private static Document[] GetDocuments(string[] sources, string language, IEnumerable<MetadataReference> additionalProjectReferences = default(IEnumerable<MetadataReference>))
+        private static Document[] GetDocuments(string[] sources, string language, IEnumerable<MetadataReference> additionalProjectReferences)
         {
             if (language != LanguageNames.CSharp && language != LanguageNames.VisualBasic)
             {
@@ -115,7 +115,7 @@ namespace TestHelper
             }
 
 
-            var project = CreateProject(sources, language, additionalProjectReferences);
+            var project = CreateProject(sources, additionalProjectReferences, language);
             var documents = project.Documents.ToArray();
 
             if (sources.Length != documents.Length)
@@ -130,11 +130,12 @@ namespace TestHelper
         /// Create a Document from a string through creating a project that contains it.
         /// </summary>
         /// <param name="source">Classes in the form of a string</param>
+        /// <param name="additionalProjectReferences">Additional references that need to be added to the generated project.</param>
         /// <param name="language">The language the source code is in</param>
         /// <returns>A Document created from the source string</returns>
-        protected static Document CreateDocument(string source, string language = LanguageNames.CSharp)
+        protected static Document CreateDocument(string source, IEnumerable<MetadataReference> additionalProjectReferences, string language = LanguageNames.CSharp)
         {
-            return CreateProject(new[] { source }, language).Documents.First();
+            return CreateProject(new[] { source }, additionalProjectReferences, language).Documents.First();
         }
 
         /// <summary>
@@ -144,12 +145,11 @@ namespace TestHelper
         /// <param name="language">The language the source code is in</param>
         /// <param name="additionalProjectReferences">Additional references that will be added to the generated project.</param>
         /// <returns>A Project created out of the Documents created from the source strings</returns>
-        private static Project CreateProject(string[] sources, string language = LanguageNames.CSharp, IEnumerable<MetadataReference> additionalProjectReferences = default(IEnumerable<MetadataReference>))
+        private static Project CreateProject(string[] sources, IEnumerable<MetadataReference> additionalProjectReferences, string language = LanguageNames.CSharp)
         {
             
             string fileNamePrefix = DefaultFilePathPrefix;
             string fileExt = language == LanguageNames.CSharp ? CSharpDefaultFileExt : VisualBasicDefaultExt;
-            additionalProjectReferences = additionalProjectReferences ?? Enumerable.Empty<MetadataReference>();
 
             var projectId = ProjectId.CreateNewId(debugName: TestProjectName);
 
